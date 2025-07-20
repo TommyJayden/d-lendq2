@@ -1,0 +1,48 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+  repositories {
+    google()
+    mavenCentral()
+  }
+  dependencies {
+    // Specify explicit versions for plugins to avoid issues
+    classpath('com.android.tools.build:gradle:8.1.0') // specify compatible version
+    classpath('com.facebook.react:react-native-gradle-plugin:0.72.4') // example version, adjust as needed
+    classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0') // specify version for kotlin
+  }
+}
+
+def reactNativeAndroidDir = new File(
+  providers.exec {
+    workingDir(rootDir)
+    commandLine("node", "--print", "require.resolve('react-native/package.json')")
+  }.standardOutput.asText.get().trim(),
+  "../android"
+)
+
+allprojects {
+  repositories {
+    maven {
+      // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+      url(reactNativeAndroidDir)
+    }
+
+    google()
+    mavenCentral()
+    maven { url 'https://www.jitpack.io' }
+
+    // Added Notifee maven repo to fix Notifee core dependency resolution
+    maven {
+      url "https://notifee-maven.s3.amazonaws.com/release"
+    }
+  }
+}
+
+// Make ndkVersion available to all modules (optional, but recommended)
+ext {
+  ndkVersion = "26.1.10909125"
+}
+
+apply plugin: "expo-root-project"
+apply plugin: "com.facebook.react.rootproject"
